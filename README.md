@@ -1,6 +1,6 @@
 # GradLab — interactive ML playground
 
-[![CI](https://github.com/YOUR_GITHUB_USERNAME/gradlab/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/gradlab/actions/workflows/ci.yml)
+[![CI](https://github.com/nrwre/gradlab/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/gradlab/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 
