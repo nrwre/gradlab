@@ -1,0 +1,54 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  # ---- Frontend -> GitHub Pages ----
+  frontend:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend
+      - id: deploy
+        uses: actions/deploy-pages@v4
+
+  # ---- Backend -> AWS Lambda (SAM) ----
+  backend:
+    runs-on: ubuntu-latest
+    # Requires repo secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, (optional) ANTHROPIC_API_KEY
+    if: ${{ vars.DEPLOY_BACKEND == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION || 'ap-south-1' }}
+      - uses: aws-actions/setup-sam@v2
+      - name: Vendor engine into backend
+        run: bash backend/build.sh
+      - name: SAM build & deploy
+        working-directory: backend
+        run: |
+          sam build
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset \
+            --stack-name gradlab --resolve-s3 --capabilities CAPABILITY_IAM \
+            --parameter-overrides AiProvider=${{ vars.AI_PROVIDER || 'stub' }} \
+              AnthropicApiKey=${{ secrets.ANTHROPIC_API_KEY }}

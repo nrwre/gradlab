@@ -1,0 +1,4 @@
+# Top-level convenience install (engine + dev). For the package proper see engine/pyproject.toml
+numpy>=1.21
+pytest>=7
+ruff>=0.1

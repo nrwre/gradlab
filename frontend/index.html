@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>GradLab — interactive ML playground</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+<header>
+  <h1>GradLab</h1>
+  <span class="tag">interactive ML playground · built on a from-scratch engine</span>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="optimize">Optimiser playground</div>
+  <div class="tab" data-tab="classify">Classifier playground</div>
+</div>
+
+<!-- OPTIMISER -->
+<div class="wrap" id="view-optimize">
+  <div class="panel">
+    <h2>Controls</h2>
+    <div class="row"><label>Surface</label>
+      <select id="o-surface">
+        <option value="quadratic">Quadratic (condition number)</option>
+        <option value="rosenbrock">Rosenbrock (non-convex)</option>
+      </select></div>
+    <div class="row" id="o-kappa-row"><label>Condition number κ <span class="val" id="o-kappa-v">20</span></label>
+      <input type="range" id="o-kappa" min="1" max="80" value="20"></div>
+    <div class="row"><label>Optimiser</label>
+      <select id="o-opt">
+        <option value="sgd">Gradient descent</option>
+        <option value="momentum">Momentum</option>
+        <option value="nesterov">Nesterov</option>
+        <option value="adam">Adam</option>
+      </select></div>
+    <div class="row"><label>Learning rate <span class="val" id="o-lr-v">0.05</span></label>
+      <input type="range" id="o-lr" min="1" max="60" value="5"></div>
+    <div class="row"><label>Steps <span class="val" id="o-steps-v">60</span></label>
+      <input type="range" id="o-steps" min="10" max="200" value="60"></div>
+    <button class="run" id="o-run">Run &amp; animate</button>
+    <p class="muted" id="o-mode"></p>
+  </div>
+  <div class="panel">
+    <div id="o-plot" class="plot"></div>
+    <div id="o-metrics"></div>
+    <div class="tutor" id="o-tutor" style="display:none"></div>
+  </div>
+</div>
+
+<!-- CLASSIFIER -->
+<div class="wrap" id="view-classify" style="display:none">
+  <div class="panel">
+    <h2>Controls</h2>
+    <div class="row"><label>Dataset</label>
+      <select id="c-data">
+        <option value="moons">Moons</option>
+        <option value="circles">Circles</option>
+        <option value="blobs">Blobs</option>
+      </select></div>
+    <div class="row"><label>Model</label>
+      <select id="c-model">
+        <option value="svm">SVM (RBF kernel)</option>
+        <option value="svm-linear">SVM (linear)</option>
+        <option value="tree">Decision tree</option>
+        <option value="forest">Random forest</option>
+        <option value="mlp">Neural net (MLP)</option>
+      </select></div>
+    <div class="row"><label>Noise <span class="val" id="c-noise-v">0.20</span></label>
+      <input type="range" id="c-noise" min="0" max="50" value="20"></div>
+    <button class="run" id="c-run">Train &amp; draw boundary</button>
+    <p class="muted" id="c-mode"></p>
+  </div>
+  <div class="panel">
+    <div id="c-plot" class="plot"></div>
+    <div id="c-metrics"></div>
+    <div class="tutor" id="c-tutor" style="display:none"></div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

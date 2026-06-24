@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install engine + dev tools
+        working-directory: engine
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: Lint (ruff)
+        working-directory: engine
+        run: ruff check nanograd
+      - name: Run tests (pytest)
+        working-directory: engine
+        run: pytest -q
+      - name: Smoke-test the backend handler
+        run: |
+          pip install numpy
+          PYTHONPATH=engine python - <<'PY'
+          import sys, json; sys.path.insert(0, "backend")
+          import handler
+          for path in ("/optimize", "/classify", "/explain"):
+              body = {"/optimize": {"optimizer":"adam","steps":20},
+                      "/classify": {"dataset":"moons","model":"tree"},
+                      "/explain": {"run":{"kind":"classify","model":"tree","dataset":"moons","accuracy":0.9}}}[path]
+              r = handler.handler({"httpMethod":"POST","path":path,"body":json.dumps(body)})
+              assert r["statusCode"] == 200, (path, r)
+              print(path, "OK")
+          PY
